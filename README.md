@@ -16,6 +16,18 @@ A full-stack web application for managing the journey of fashion garments from i
 
 ## Quick Start
 
+### One-command setup (Docker)
+
+```bash
+docker compose up --build
+```
+
+This starts Postgres, the backend (with auto-seeded data), and the frontend. Open http://localhost:5173 once everything is up.
+
+To stop: `docker compose down`
+
+### Manual setup
+
 ### 1. Start PostgreSQL
 
 ```bash

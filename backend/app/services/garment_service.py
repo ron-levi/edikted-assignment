@@ -13,9 +13,14 @@ from app.models import (
 from app.schemas.garment import GarmentCreate, GarmentUpdate, GarmentVariationCreate
 from app.schemas.material import GarmentMaterialCreate
 from app.schemas.attribute import GarmentAttributeCreate
-from app.exceptions import NotFoundError, DeletionProtectedError, ValidationError
+from app.exceptions import NotFoundError, DeletionProtectedError, ProductionProtectedError, ValidationError
 from app.services.lifecycle import validate_garment_transition
 from app.services.attribute_service import check_attribute_compatibility
+
+
+def _ensure_not_production(garment: Garment, operation: str) -> None:
+    if garment.lifecycle_stage == "PRODUCTION":
+        raise ProductionProtectedError(garment.name, operation)
 
 
 async def get_garments(
@@ -62,6 +67,8 @@ async def update_garment(
     garment = result.scalar_one_or_none()
     if not garment:
         raise NotFoundError("Garment", garment_id)
+
+    _ensure_not_production(garment, "update")
 
     if data.name is not None:
         garment.name = data.name
@@ -125,8 +132,10 @@ async def add_material(
 ) -> GarmentMaterial:
     # Verify garment exists
     result = await db.execute(select(Garment).where(Garment.id == garment_id))
-    if not result.scalar_one_or_none():
+    garment = result.scalar_one_or_none()
+    if not garment:
         raise NotFoundError("Garment", garment_id)
+    _ensure_not_production(garment, "add material")
 
     # Verify material exists
     result = await db.execute(select(Material).where(Material.id == data.material_id))
@@ -160,6 +169,13 @@ async def add_material(
 async def remove_material(
     db: AsyncSession, garment_id: int, material_id: int
 ) -> None:
+    # Verify garment exists and not in production
+    result = await db.execute(select(Garment).where(Garment.id == garment_id))
+    garment = result.scalar_one_or_none()
+    if not garment:
+        raise NotFoundError("Garment", garment_id)
+    _ensure_not_production(garment, "remove material")
+
     result = await db.execute(
         select(GarmentMaterial).where(
             GarmentMaterial.garment_id == garment_id,
@@ -179,8 +195,10 @@ async def add_attribute(
 ) -> GarmentAttribute:
     # Verify garment exists
     result = await db.execute(select(Garment).where(Garment.id == garment_id))
-    if not result.scalar_one_or_none():
+    garment = result.scalar_one_or_none()
+    if not garment:
         raise NotFoundError("Garment", garment_id)
+    _ensure_not_production(garment, "add attribute")
 
     # Verify attribute exists
     result = await db.execute(
@@ -202,6 +220,13 @@ async def add_attribute(
 async def remove_attribute(
     db: AsyncSession, garment_id: int, attribute_id: int
 ) -> None:
+    # Verify garment exists and not in production
+    result = await db.execute(select(Garment).where(Garment.id == garment_id))
+    garment = result.scalar_one_or_none()
+    if not garment:
+        raise NotFoundError("Garment", garment_id)
+    _ensure_not_production(garment, "remove attribute")
+
     result = await db.execute(
         select(GarmentAttribute).where(
             GarmentAttribute.garment_id == garment_id,

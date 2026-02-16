@@ -42,6 +42,15 @@ class DeletionProtectedError(AppException):
         )
 
 
+class ProductionProtectedError(AppException):
+    def __init__(self, garment_name: str, operation: str):
+        super().__init__(
+            status_code=403,
+            error_code="PRODUCTION_PROTECTED",
+            detail=f"Garment '{garment_name}' is in PRODUCTION stage and cannot be modified ({operation}).",
+        )
+
+
 class ValidationError(AppException):
     def __init__(self, detail: str):
         super().__init__(

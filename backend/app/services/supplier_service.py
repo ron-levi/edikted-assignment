@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload
 from app.models import Supplier, GarmentSupplier, Garment, SampleSet
 from app.schemas.supplier import SupplierCreate, SupplierUpdate, GarmentSupplierCreate
 from app.schemas.sample_set import SampleSetCreate, SampleSetUpdate
-from app.exceptions import NotFoundError
+from app.exceptions import NotFoundError, ProductionProtectedError
 from app.services.lifecycle import validate_supplier_transition, validate_sample_transition
 
 
@@ -69,10 +69,13 @@ async def _get_garment_supplier(
 async def associate_supplier(
     db: AsyncSession, garment_id: int, data: GarmentSupplierCreate
 ) -> GarmentSupplier:
-    # Verify garment exists
+    # Verify garment exists and not in production
     result = await db.execute(select(Garment).where(Garment.id == garment_id))
-    if not result.scalar_one_or_none():
+    garment = result.scalar_one_or_none()
+    if not garment:
         raise NotFoundError("Garment", garment_id)
+    if garment.lifecycle_stage == "PRODUCTION":
+        raise ProductionProtectedError(garment.name, "associate supplier")
 
     # Verify supplier exists
     result = await db.execute(
