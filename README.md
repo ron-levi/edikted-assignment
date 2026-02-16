@@ -28,14 +28,14 @@ To stop: `docker compose down`
 
 ### Manual setup
 
-### 1. Start PostgreSQL
+#### 1. Start PostgreSQL
 
 ```bash
 cd backend
 make db-up
 ```
 
-### 2. Start Backend
+#### 2. Start Backend
 
 ```bash
 cd backend
@@ -45,7 +45,7 @@ make dev       # starts FastAPI on http://localhost:8000
 
 API docs available at http://localhost:8000/docs
 
-### 3. Start Frontend
+#### 3. Start Frontend
 
 ```bash
 cd frontend
