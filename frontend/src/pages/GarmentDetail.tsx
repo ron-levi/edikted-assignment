@@ -64,7 +64,7 @@ export function GarmentDetail() {
     }
   };
 
-  const handleAddMaterial = async (e: React.FormEvent) => {
+  const handleAddMaterial = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await addMaterialMutation.mutateAsync({
@@ -79,7 +79,7 @@ export function GarmentDetail() {
     }
   };
 
-  const handleAddAttribute = async (e: React.FormEvent) => {
+  const handleAddAttribute = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await addAttributeMutation.mutateAsync({
@@ -93,7 +93,7 @@ export function GarmentDetail() {
     }
   };
 
-  const handleAssociateSupplier = async (e: React.FormEvent) => {
+  const handleAssociateSupplier = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await associateSupplierMutation.mutateAsync({
@@ -122,7 +122,7 @@ export function GarmentDetail() {
     }
   };
 
-  const handleCreateVariation = async (e: React.FormEvent) => {
+  const handleCreateVariation = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await createVariationMutation.mutateAsync({
@@ -150,6 +150,7 @@ export function GarmentDetail() {
   };
 
   // Filter out already-assigned materials/attributes/suppliers from dropdowns
+  const totalPct = garment.materials.reduce((sum, m) => sum + m.percentage, 0);
   const assignedMaterialIds = new Set(garment.materials.map((m) => m.id));
   const availableMaterials = allMaterials?.filter((m) => !assignedMaterialIds.has(m.id)) || [];
 
@@ -174,7 +175,14 @@ export function GarmentDetail() {
               </p>
             )}
           </div>
-          <button onClick={handleDelete} className="text-red-500 hover:text-red-700 text-sm">Delete</button>
+          <button
+            onClick={handleDelete}
+            disabled={garment.lifecycle_stage === "PRODUCTION"}
+            title={garment.lifecycle_stage === "PRODUCTION" ? "Cannot delete garments in PRODUCTION stage" : "Delete garment"}
+            className={`text-red-500 hover:text-red-700 text-sm ${garment.lifecycle_stage === "PRODUCTION" ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            Delete
+          </button>
         </div>
       </div>
 
@@ -258,6 +266,7 @@ export function GarmentDetail() {
           ) : (
             <p className="text-gray-400 text-sm mb-4">No materials assigned.</p>
           )}
+          <p className="text-sm text-gray-500 mb-2">Current total: {totalPct}% ({(100 - totalPct).toFixed(1)}% available)</p>
           <form onSubmit={handleAddMaterial} className="flex gap-2 items-end">
             <select
               value={matId}
@@ -276,7 +285,7 @@ export function GarmentDetail() {
               onChange={(e) => setMatPct(e.target.value)}
               placeholder="%"
               min="0.01"
-              max="100"
+              max={100 - totalPct}
               step="0.01"
               className="border rounded-lg px-2 py-1.5 text-sm w-20"
               required
@@ -348,20 +357,24 @@ export function GarmentDetail() {
                       <td className="py-2">{s.offer_price != null ? `$${s.offer_price.toFixed(2)}` : "-"}</td>
                       <td className="py-2">
                         <div className="flex gap-1 flex-wrap">
-                          {transitions.map((target) => (
-                            <button
-                              key={target}
-                              onClick={() => handleSupplierTransition(s.supplier_id, target)}
-                              disabled={transitionSupplierMutation.isPending}
-                              className={`px-2 py-0.5 rounded text-xs font-medium ${
-                                target === "REJECTED"
-                                  ? "bg-red-100 text-red-700 hover:bg-red-200"
-                                  : "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
-                              } disabled:opacity-50`}
-                            >
-                              {target.replace(/_/g, " ")}
-                            </button>
-                          ))}
+                          {transitions.map((target) => {
+                            const colorClass =
+                              target === "REJECTED"
+                                ? "bg-red-600 text-white hover:bg-red-700"
+                                : target === "APPROVED" || target === "IN_PRODUCTION" || target === "IN_STORE"
+                                ? "bg-green-600 text-white hover:bg-green-700"
+                                : "bg-indigo-100 text-indigo-700 hover:bg-indigo-200";
+                            return (
+                              <button
+                                key={target}
+                                onClick={() => handleSupplierTransition(s.supplier_id, target)}
+                                disabled={transitionSupplierMutation.isPending}
+                                className={`px-2 py-0.5 rounded text-xs font-medium ${colorClass} disabled:opacity-50`}
+                              >
+                                {target.replace(/_/g, " ")}
+                              </button>
+                            );
+                          })}
                         </div>
                       </td>
                     </tr>

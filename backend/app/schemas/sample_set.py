@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
@@ -11,7 +13,7 @@ class SampleSetCreate(SampleSetBase):
 
 
 class SampleSetUpdate(SampleSetBase):
-    status: str
+    status: Literal["PENDING", "RECEIVED", "APPROVED", "REJECTED"]
 
 
 class SampleSetResponse(BaseModel):

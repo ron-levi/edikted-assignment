@@ -30,3 +30,18 @@ def validate_supplier_transition(current_status: str, target_status: str) -> Non
     valid_targets = SUPPLIER_TRANSITIONS.get(current_status, set())
     if target_status not in valid_targets:
         raise InvalidTransitionError(current_status, target_status, sorted(valid_targets))
+
+
+# Sample set status transitions
+SAMPLE_TRANSITIONS: dict[str, set[str]] = {
+    "PENDING": {"RECEIVED"},
+    "RECEIVED": {"APPROVED", "REJECTED"},
+    "APPROVED": set(),  # Terminal state
+    "REJECTED": set(),  # Terminal state
+}
+
+
+def validate_sample_transition(current_status: str, target_status: str) -> None:
+    valid_targets = SAMPLE_TRANSITIONS.get(current_status, set())
+    if target_status not in valid_targets:
+        raise InvalidTransitionError(current_status, target_status, sorted(valid_targets))

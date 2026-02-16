@@ -18,7 +18,7 @@ export function Dashboard() {
   const createMutation = useCreateGarment();
   const deleteMutation = useDeleteGarment();
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!newName.trim()) return;
     try {

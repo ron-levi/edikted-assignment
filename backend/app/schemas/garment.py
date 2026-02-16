@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 
@@ -17,7 +19,7 @@ class GarmentUpdate(BaseModel):
 
 
 class GarmentTransition(BaseModel):
-    target_stage: str
+    target_stage: Literal["CONCEPT", "DESIGN", "DEVELOPMENT", "SAMPLING", "PRODUCTION"]
 
 
 class GarmentVariationCreate(GarmentBase):

@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 
@@ -27,13 +29,13 @@ class SupplierResponse(BaseModel):
 
 class GarmentSupplierCreate(BaseModel):
     supplier_id: int
-    offer_price: float | None = None
-    lead_time_days: int | None = None
+    offer_price: float | None = Field(None, ge=0)
+    lead_time_days: int | None = Field(None, ge=0)
     notes: str | None = None
 
 
 class GarmentSupplierTransition(BaseModel):
-    target_status: str
+    target_status: Literal["OFFERED", "SAMPLING", "APPROVED", "REJECTED", "IN_PRODUCTION", "IN_STORE"]
 
 
 class GarmentSupplierResponse(BaseModel):

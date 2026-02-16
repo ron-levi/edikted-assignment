@@ -26,14 +26,14 @@ export interface GarmentAttribute {
 export interface GarmentSupplierSummary {
   supplier_id: number;
   supplier_name: string;
-  status: string;
+  status: SupplierStatus;
   offer_price: number | null;
 }
 
 export interface GarmentVariation {
   id: number;
   name: string;
-  lifecycle_stage: string;
+  lifecycle_stage: LifecycleStage;
 }
 
 export interface GarmentDetail extends Garment {

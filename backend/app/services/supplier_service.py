@@ -6,7 +6,7 @@ from app.models import Supplier, GarmentSupplier, Garment, SampleSet
 from app.schemas.supplier import SupplierCreate, SupplierUpdate, GarmentSupplierCreate
 from app.schemas.sample_set import SampleSetCreate, SampleSetUpdate
 from app.exceptions import NotFoundError
-from app.services.lifecycle import validate_supplier_transition
+from app.services.lifecycle import validate_supplier_transition, validate_sample_transition
 
 
 async def get_suppliers(db: AsyncSession) -> list[Supplier]:
@@ -144,6 +144,7 @@ async def update_sample_set(
     if not sample:
         raise NotFoundError("SampleSet", sample_id)
 
+    validate_sample_transition(sample.status, data.status)
     sample.status = data.status
     if data.notes is not None:
         sample.notes = data.notes
