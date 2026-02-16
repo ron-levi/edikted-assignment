@@ -16,5 +16,19 @@ services:
       timeout: 5s
       retries: 5
 
+  api:
+    build: .
+    container_name: fashion_plm_api
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/fashion_plm
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:

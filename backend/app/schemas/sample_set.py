@@ -2,13 +2,16 @@ from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 
-class SampleSetCreate(BaseModel):
+class SampleSetBase(BaseModel):
     notes: str | None = None
 
 
-class SampleSetUpdate(BaseModel):
+class SampleSetCreate(SampleSetBase):
+    pass
+
+
+class SampleSetUpdate(SampleSetBase):
     status: str
-    notes: str | None = None
 
 
 class SampleSetResponse(BaseModel):

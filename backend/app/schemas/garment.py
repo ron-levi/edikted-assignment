@@ -2,9 +2,13 @@ from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 
 
-class GarmentCreate(BaseModel):
+class GarmentBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     description: str | None = None
+
+
+class GarmentCreate(GarmentBase):
+    pass
 
 
 class GarmentUpdate(BaseModel):
@@ -16,9 +20,8 @@ class GarmentTransition(BaseModel):
     target_stage: str
 
 
-class GarmentVariationCreate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=200)
-    description: str | None = None
+class GarmentVariationCreate(GarmentBase):
+    pass
 
 
 class GarmentResponse(BaseModel):

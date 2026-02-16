@@ -6,9 +6,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
 from app.config import get_settings
-from app.database import engine, Base
 from app.exceptions import AppException
-from app.models import *  # noqa: F401, F403 -- ensures all models are registered with Base
 from app.routers import garments, materials, attributes, suppliers
 
 settings = get_settings()
@@ -16,7 +14,13 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
+    from app.database import Base, engine, async_session
+    from app.seed import seed_data
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    async with async_session() as db:
+        await seed_data(db)
     yield
 
 

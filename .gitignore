@@ -28,5 +28,8 @@ pgdata/
 # Agents
 .agents/
 
+# Claude
+.claude/
+
 # PDF requirements
 *.pdf

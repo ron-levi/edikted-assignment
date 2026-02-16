@@ -3,7 +3,7 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    database_url: str = "postgresql://postgres:postgres@localhost:5432/fashion_plm"
+    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/fashion_plm"
     cors_origins: list[str] = ["http://localhost:5173"]
     debug: bool = True
 

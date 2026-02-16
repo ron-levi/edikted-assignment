@@ -2,9 +2,13 @@ from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 
 
-class SupplierCreate(BaseModel):
+class SupplierBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     contact_info: str | None = None
+
+
+class SupplierCreate(SupplierBase):
+    pass
 
 
 class SupplierUpdate(BaseModel):
